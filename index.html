@@ -3,22 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PixelLab Pro Web Clone</title>
+    <title>MakerLab Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Arimo&family=Lobster&family=Pacifico&family=Poppins&family=Roboto&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Arimo&family=Lobster&family=Pacifico&family=Poppins:wght@400;700;900&family=Roboto&display=swap" rel="stylesheet">
     <style>
         /* Custom scrollbar for clean UI */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #1f2937; }
         ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+
+        /* 🔥 লোগো এবং টেক্সট অ্যানিমেশন */
+        @keyframes logoEntrance {
+            0% { transform: scale(0.85); opacity: 0; filter: blur(8px); }
+            50% { transform: scale(1.03); filter: blur(0px); text-shadow: 0 0 35px rgba(34, 211, 238, 0.6); }
+            100% { transform: scale(1); opacity: 1; text-shadow: 0 0 20px rgba(34, 211, 238, 0.3); }
+        }
+        
+        .animate-logo {
+            animation: logoEntrance 1.4s ease-out forwards;
+        }
+
+        /* স্প্ল্যাশ স্ক্রিন রিমুভ হওয়ার স্মুথ ট্রানজিশন */
+        .splash-fade-out {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease-in-out;
+        }
     </style>
 </head>
-<body class="bg-gray-900 text-gray-100 h-screen flex flex-col overflow-hidden font-sans">
+<body class="bg-gray-900 text-gray-100 h-screen flex flex-col overflow-hidden font-sans relative">
+
+    <div id="splashScreen" class="absolute inset-0 bg-slate-950 flex flex-col items-center justify-center z-50 transition-opacity duration-700">
+        <div class="text-center space-y-4">
+            <div class="animate-logo flex flex-col items-center">
+                <div class="w-24 h-24 bg-gradient-to-tr from-cyan-500 to-blue-600 rounded-3xl flex items-center justify-center shadow-[0_0_50px_rgba(34,211,238,0.4)] mb-5">
+                    <span class="text-white text-5xl font-black tracking-tighter">ML</span>
+                </div>
+                <h1 class="text-4xl md:text-5xl font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-blue-500">
+                    MAKERLAB <span class="text-xs font-bold text-cyan-400 border border-cyan-400 px-1.5 py-0.5 rounded ml-1 tracking-normal align-middle">PRO</span>
+                </h1>
+                <p class="text-gray-400 text-xs mt-3 tracking-widest uppercase opacity-75">Your Ultimate Design Studio</p>
+            </div>
+            
+            <div class="w-52 h-1 bg-gray-800 rounded-full mx-auto overflow-hidden mt-6">
+                <div class="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full w-full origin-left scale-x-0 transition-transform duration-[2500ms] ease-out" id="loadingProgress"></div>
+            </div>
+        </div>
+    </div>
 
     <header class="bg-gray-800 px-4 py-2 flex justify-between items-center border-b border-gray-700 h-14">
         <div class="flex items-center space-x-4">
-            <h1 class="text-lg font-black tracking-wider text-cyan-400">PIXELLAB <span class="text-xs font-normal text-gray-400">PRO</span></h1>
+            <h1 class="text-lg font-black tracking-wider text-cyan-400">MAKERLAB <span class="text-xs font-normal text-gray-400">PRO</span></h1>
             <div class="flex items-center bg-gray-700 rounded p-0.5 space-x-1 text-sm">
                 <button id="undoBtn" class="px-2.5 py-1 hover:bg-gray-600 rounded" title="Undo">↩</button>
                 <button id="redoBtn" class="px-2.5 py-1 hover:bg-gray-600 rounded" title="Redo">↪</button>
