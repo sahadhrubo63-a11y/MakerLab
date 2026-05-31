@@ -3,57 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MakerLab Pro</title>
+    <title>PixelLab Pro Web Clone</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Arimo&family=Lobster&family=Pacifico&family=Poppins:wght@400;700;900&family=Roboto&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Arimo&family=Lobster&family=Pacifico&family=Poppins&family=Roboto&display=swap" rel="stylesheet">
     <style>
+        /* Custom scrollbar for clean UI */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #1f2937; }
         ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
-
-        /* লোগো অ্যানিমেশন ইফেক্ট */
-        @keyframes logoEntrance {
-            0% { transform: scale(0.8); opacity: 0; filter: blur(10px); }
-            50% { transform: scale(1.05); filter: blur(0px); text-shadow: 0 0 30px rgba(34, 211, 238, 0.6); }
-            100% { transform: scale(1); opacity: 1; text-shadow: 0 0 20px rgba(34, 211, 238, 0.3); }
-        }
-        
-        .animate-logo {
-            animation: logoEntrance 1.5s ease-out forwards;
-        }
-
-        /* স্প্ল্যাশ স্ক্রিন রিমুভ হওয়ার ট্রানজিশন */
-        .splash-fade-out {
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.8s ease-in-out;
-        }
     </style>
 </head>
-<body class="bg-gray-900 text-gray-100 h-screen flex flex-col overflow-hidden font-sans relative">
-
-    <div id="splashScreen" class="absolute inset-0 bg-slate-950 flex flex-col items-center justify-center z-50 transition-opacity duration-700">
-        <div class="text-center space-y-4">
-            <div class="animate-logo flex flex-col items-center">
-                <div class="w-20 h-20 bg-gradient-to-tr from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-[0_0_40px_rgba(34,211,238,0.4)] mb-4">
-                    <span class="text-white text-4xl font-black tracking-tighter">ML</span>
-                </div>
-                <h1 class="text-4xl md:text-5xl font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-blue-500">
-                    MAKERLAB <span class="text-xs font-bold text-cyan-400 border border-cyan-400 px-1.5 py-0.5 rounded ml-1 tracking-normal align-middle">PRO</span>
-                </h1>
-                <p class="text-gray-400 text-xs mt-3 tracking-widest uppercase opacity-75">Your Ultimate Design Studio</p>
-            </div>
-            
-            <div class="w-48 h-1 bg-gray-800 rounded-full mx-auto overflow-hidden mt-6">
-                <div class="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full w-full origin-left scale-x-0 transition-transform duration-[2500ms] ease-out" id="loadingProgress"></div>
-            </div>
-        </div>
-    </div>
+<body class="bg-gray-900 text-gray-100 h-screen flex flex-col overflow-hidden font-sans">
 
     <header class="bg-gray-800 px-4 py-2 flex justify-between items-center border-b border-gray-700 h-14">
         <div class="flex items-center space-x-4">
-            <h1 class="text-lg font-black tracking-wider text-cyan-400">MAKERLAB <span class="text-xs font-normal text-gray-400">PRO</span></h1>
+            <h1 class="text-lg font-black tracking-wider text-cyan-400">PIXELLAB <span class="text-xs font-normal text-gray-400">PRO</span></h1>
             <div class="flex items-center bg-gray-700 rounded p-0.5 space-x-1 text-sm">
                 <button id="undoBtn" class="px-2.5 py-1 hover:bg-gray-600 rounded" title="Undo">↩</button>
                 <button id="redoBtn" class="px-2.5 py-1 hover:bg-gray-600 rounded" title="Redo">↪</button>
@@ -140,8 +105,41 @@
                                 <input type="range" id="textOpacity" min="0" max="100" value="100" class="w-full accent-cyan-500">
                             </div>
                             <div>
+                                <div class="flex justify-between"><span>Letter Spacing</span><span id="v-lspace">0</span></div>
+                                <input type="range" id="letterSpacing" min="-5" max="30" value="0" class="w-full accent-cyan-500">
+                            </div>
+                            <div>
+                                <div class="flex justify-between"><span>Line Height</span><span id="v-lheight">1.2</span></div>
+                                <input type="range" id="lineHeight" min="0.5" max="2.5" step="0.1" value="1.2" class="w-full accent-cyan-500">
+                            </div>
+                            <div>
                                 <div class="flex justify-between"><span>Rotation</span><span id="v-rot">0°</span></div>
                                 <input type="range" id="textRotation" min="0" max="360" value="0" class="w-full accent-cyan-500">
+                            </div>
+                            <div>
+                                <div class="flex justify-between"><span>Curved Text (Warp)</span><span id="v-curve">0</span></div>
+                                <input type="range" id="textCurve" min="-100" max="100" value="0" class="w-full accent-cyan-500">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs text-gray-500 mb-1">Alignment</label>
+                            <div class="grid grid-cols-3 gap-1 bg-gray-900 p-1 rounded text-center text-xs">
+                                <button id="alignLeft" class="py-1 hover:bg-gray-700 rounded font-bold">Left</button>
+                                <button id="alignCenter" class="py-1 bg-gray-700 text-cyan-400 rounded font-bold">Center</button>
+                                <button id="alignRight" class="py-1 hover:bg-gray-700 rounded font-bold">Right</button>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 pt-2 border-t border-gray-700">
+                            <label class="block text-xs text-gray-400 uppercase">Text Effects (FX)</label>
+                            <div class="grid grid-cols-2 gap-2 text-xs">
+                                <label class="flex items-center space-x-2 bg-gray-900 p-2 rounded cursor-pointer"><input type="checkbox" id="fxStroke"> <span>Outline/Stroke</span></label>
+                                <label class="flex items-center space-x-2 bg-gray-900 p-2 rounded cursor-pointer"><input type="checkbox" id="fxShadow"> <span>Outer Shadow</span></label>
+                                <label class="flex items-center space-x-2 bg-gray-900 p-2 rounded cursor-pointer"><input type="checkbox" id="fxInnerShadow"> <span>Inner Shadow</span></label>
+                                <label class="flex items-center space-x-2 bg-gray-900 p-2 rounded cursor-pointer"><input type="checkbox" id="fx3D"> <span>3D Text Effect</span></label>
+                                <label class="flex items-center space-x-2 bg-gray-900 p-2 rounded cursor-pointer"><input type="checkbox" id="fxReflection"> <span>Reflection</span></label>
+                                <label class="flex items-center space-x-2 bg-gray-900 p-2 rounded cursor-pointer"><input type="checkbox" id="fxEmboss"> <span>Emboss / Glow</span></label>
                             </div>
                         </div>
                     </div>
@@ -158,6 +156,8 @@
                                 <option value="😊">😊 Smile</option>
                                 <option value="🔥">🔥 Fire</option>
                                 <option value="👑">👑 Crown</option>
+                                <option value="💥">💥 Boom</option>
+                                <option value="❤️">❤️ Love</option>
                             </select>
                         </div>
                     </div>
@@ -168,6 +168,9 @@
                             <button onclick="addShape('rect')" class="bg-gray-900 p-2 rounded hover:bg-gray-750">Rectangle</button>
                             <button onclick="addShape('circle')" class="bg-gray-900 p-2 rounded hover:bg-gray-750">Circle</button>
                             <button onclick="addShape('triangle')" class="bg-gray-900 p-2 rounded hover:bg-gray-750">Triangle</button>
+                            <button onclick="addShape('star')" class="bg-gray-900 p-2 rounded hover:bg-gray-750">Star</button>
+                            <button onclick="addShape('arrow')" class="bg-gray-900 p-2 rounded hover:bg-gray-750">Arrow</button>
+                            <button onclick="addShape('line')" class="bg-gray-900 p-2 rounded hover:bg-gray-750">Line</button>
                         </div>
                     </div>
 
@@ -180,6 +183,7 @@
                         </div>
 
                         <div class="grid grid-cols-2 gap-2">
+                            <button id="cropBtn" class="bg-gray-700 p-2 rounded hover:bg-gray-600">Crop Layer</button>
                             <button id="flipXBtn" class="bg-gray-700 p-2 rounded hover:bg-gray-600">Flip X</button>
                         </div>
                         <div>
@@ -188,8 +192,10 @@
                                 <option value="none">Normal</option>
                                 <option value="grayscale">Grayscale</option>
                                 <option value="sepia">Sepia</option>
+                                <option value="invert">Invert</option>
                             </select>
                         </div>
+                        <button id="freehandDraw" class="w-full bg-orange-700 hover:bg-orange-600 p-2 rounded font-medium">🖌️ Freehand Drawing Pen</button>
                     </div>
                 </div>
 
@@ -198,6 +204,7 @@
                     <div class="space-y-3">
                         <label class="flex items-center space-x-2"><input type="radio" name="bgType" value="solid" checked> <span>Solid Color</span></label>
                         <input type="color" id="bgColorInput" value="#111827" class="w-full h-8 bg-transparent cursor-pointer">
+                        <label class="flex items-center space-x-2"><input type="radio" name="bgType" value="transparent"> <span>Transparent</span></label>
                     </div>
                 </div>
 
@@ -209,11 +216,14 @@
                 <button onclick="zoomCanvas(0.9)" class="hover:text-cyan-400 font-bold px-1">➖</button>
                 <span id="zoomLevel">Zoom: 100%</span>
                 <button onclick="zoomCanvas(1.1)" class="hover:text-cyan-400 font-bold px-1">➕</button>
+                <button onclick="resetZoom()" class="text-gray-400 text-[10px] uppercase border border-gray-600 px-1.5 py-0.5 rounded">Reset</button>
             </div>
 
             <div id="canvas-wrapper" class="shadow-2xl border border-gray-700 bg-white">
                 <canvas id="mainPixelCanvas"></canvas>
             </div>
+            
+            <p class="text-gray-500 text-[11px] mt-3">💡 Tip: Double click texts to change content.</p>
         </main>
 
         <aside class="w-64 bg-gray-800 border-l border-gray-700 flex flex-col">
@@ -221,11 +231,18 @@
                 <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400">Layer Manager</h3>
                 <span class="text-[10px] bg-gray-700 px-2 py-0.5 rounded text-gray-300" id="layerCount">0 Layers</span>
             </div>
+            
             <div id="layerListContainer" class="flex-1 overflow-y-auto p-2 space-y-1.5 text-xs">
                 <p class="text-center text-gray-500 mt-10 italic">No layers present.</p>
             </div>
-            <div class="p-3 bg-gray-850 border-t border-gray-700 text-xs">
-                <button id="layerDelete" class="w-full bg-red-950 text-red-400 p-1.5 rounded hover:bg-red-900">Delete Layer</button>
+
+            <div class="p-3 bg-gray-850 border-t border-gray-700 space-y-2 text-xs">
+                <div class="grid grid-cols-2 gap-1 text-center">
+                    <button id="layerUp" class="bg-gray-700 p-1.5 rounded hover:bg-gray-600">Forward</button>
+                    <button id="layerDown" class="bg-gray-700 p-1.5 rounded hover:bg-gray-600">Backward</button>
+                    <button id="layerDuplicate" class="bg-gray-700 p-1.5 rounded hover:bg-gray-600 text-yellow-400">Duplicate</button>
+                    <button id="layerDelete" class="bg-red-950 text-red-400 p-1.5 rounded hover:bg-red-900">Delete</button>
+                </div>
             </div>
         </aside>
 
