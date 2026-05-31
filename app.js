@@ -12,7 +12,6 @@ window.addEventListener('load', () => {
 });
 
 function initCanvas() {
-    // সঠিক উইডথ ও হাইট দিয়ে Fabric Canvas চালু করা
     canvas = new fabric.Canvas('mainPixelCanvas', {
         width: 500,
         height: 500,
@@ -20,7 +19,6 @@ function initCanvas() {
         preserveObjectStacking: true
     });
     
-    // সিলেক্টেড অবজেক্ট বর্ডার স্টাইল
     fabric.Object.prototype.set({
         transparentCorners: false,
         cornerColor: '#22d3ee',
@@ -29,7 +27,6 @@ function initCanvas() {
         cornerStyle: 'circle'
     });
 
-    // লিসেনার্স
     canvas.on('object:modified', () => saveState());
     canvas.on('object:added', () => { updateLayerPanel(); saveState(); });
     canvas.on('object:removed', () => { updateLayerPanel(); saveState(); });
@@ -42,7 +39,6 @@ function initCanvas() {
     saveState();
 }
 
-// গ্লোবাল ট্যাব সুইচ ফাংশন
 window.switchTab = function(tabId) {
     document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
     document.querySelectorAll('.tab-btn').forEach(el => {
@@ -141,12 +137,45 @@ function setupEventListeners() {
         e.target.value = ""; 
     });
 
-    // --- ASPECT RATIO ---
+    // --- UNIVERSAL ASSET COLOR CHANGER (SHAPE & IMAGE TINT) ---
+    document.getElementById('shapeFill').addEventListener('input', (e) => {
+        let activeObj = canvas.getActiveObject();
+        if (!activeObj) return;
+
+        let targetColor = e.target.value;
+
+        // যদি অবজেক্টটি Shape বা Vector হয়
+        if (activeObj.type === 'rect' || activeObj.type === 'circle' || activeObj.type === 'triangle' || activeObj.type === 'star' || activeObj.type === 'arrow' || activeObj.type === 'line') {
+            activeObj.set('fill', targetColor);
+        } 
+        // যদি অবজেক্টটি Image হয় (PixelLab Blend Color Tint Mode)
+        else if (activeObj.type === 'image') {
+            activeObj.filters = [
+                new fabric.Image.filters.BlendColor({
+                    color: targetColor,
+                    mode: 'tint',
+                    alpha: 0.9
+                })
+            ];
+            activeObj.applyFilters();
+        }
+        canvas.renderAll();
+    });
+
+    // --- ৫টি নির্দিষ্ট ASPECT RATIO CONTROLLER ---
     document.getElementById('canvasPreset').addEventListener('change', (e) => {
         let ratio = e.target.value;
-        if (ratio === '16:9') { canvas.setWidth(750); canvas.setHeight(422); }
-        else if (ratio === '4:5') { canvas.setWidth(500); canvas.setHeight(625); }
-        else { canvas.setWidth(500); canvas.setHeight(500); }
+        if (ratio === 'fb_post') { 
+            canvas.setWidth(600); canvas.setHeight(450); // Facebook Post (4:3)
+        } else if (ratio === 'ig_post') { 
+            canvas.setWidth(500); canvas.setHeight(500); // Instagram Post (1:1 Standard)
+        } else if (ratio === 'fb_banner') { 
+            canvas.setWidth(820); canvas.setHeight(312); // Facebook Cover Banner
+        } else if (ratio === 'yt_thumb') { 
+            canvas.setWidth(711); canvas.setHeight(400); // YouTube Thumbnail (16:9)
+        } else { 
+            canvas.setWidth(500); canvas.setHeight(500); // Custom Default (1:1)
+        }
         canvas.renderAll();
     });
 
