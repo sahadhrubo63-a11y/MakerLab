@@ -27,11 +27,12 @@
         
         <div class="flex items-center space-x-2 text-xs">
             <span class="text-gray-400">Aspect Ratio:</span>
-            <select id="canvasPreset" class="bg-gray-700 border border-gray-600 rounded px-2 py-1 focus:outline-none">
-                <option value="1:1">Custom (1:1)</option>
-                <option value="16:9">YouTube Thumbnail (16:9)</option>
-                <option value="4:5">Instagram Post (4:5)</option>
-                <option value="820:312">Facebook Banner</option>
+            <select id="canvasPreset" class="bg-gray-700 border border-gray-600 rounded px-2 py-1 focus:outline-none text-white">
+                <option value="custom">Custom (1:1)</option>
+                <option value="fb_post">Facebook Post (4:3)</option>
+                <option value="ig_post">Instagram Post (1:1)</option>
+                <option value="fb_banner">Facebook Banner</option>
+                <option value="yt_thumb">YouTube Thumbnail (16:9)</option>
             </select>
         </div>
 
@@ -175,10 +176,12 @@
 
                     <div class="border-t border-gray-700 pt-3 space-y-3 text-xs">
                         <label class="block text-xs text-gray-400 uppercase">Graphic Adjustments</label>
-                        <div class="flex items-center justify-between">
-                            <span>Shape Color</span>
-                            <input type="color" id="shapeFill" value="#00ffff" class="w-7 h-7 bg-transparent border-0 cursor-pointer">
+                        
+                        <div class="flex items-center justify-between bg-gray-900 p-2.5 rounded border border-gray-700">
+                            <span>Asset Color (Shape/Image)</span>
+                            <input type="color" id="shapeFill" value="#00ffff" class="w-8 h-8 bg-transparent border-0 cursor-pointer">
                         </div>
+
                         <div class="grid grid-cols-2 gap-2">
                             <button id="cropBtn" class="bg-gray-700 p-2 rounded hover:bg-gray-600">Crop Layer</button>
                             <button id="flipXBtn" class="bg-gray-700 p-2 rounded hover:bg-gray-600">Flip X</button>
