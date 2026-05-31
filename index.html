@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MakerLab</title>
+    <title>PixelLab Pro Web Clone</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Arimo&family=Lobster&family=Pacifico&family=Poppins&family=Roboto&display=swap" rel="stylesheet">
@@ -83,17 +83,14 @@
 
                         <div>
                             <label class="block text-xs text-gray-500 mb-1">Fill Type</label>
-                            <div class="flex space-x-2 mb-2">
+                            <div class="flex space-x-2 mb-2 text-xs">
                                 <label><input type="radio" name="textFillType" value="solid" checked> Solid</label>
                                 <label><input type="radio" name="textFillType" value="gradient"> Gradient</label>
                                 <label><input type="radio" name="textFillType" value="texture"> Texture</label>
                             </div>
                             <div id="solidColorPickers" class="flex items-center space-x-2">
-                                <input type="color" id="textColor" class="w-8 h-8 bg-transparent border-0 cursor-pointer">
+                                <input type="color" id="textColor" class="w-8 h-8 bg-transparent border-0 cursor-pointer" value="#ffffff">
                                 <span class="text-xs text-gray-400">Choose Text Color</span>
-                            </div>
-                            <div id="texturePicker" class="hidden">
-                                <input type="file" id="textTextureFile" accept="image/*" class="text-xs">
                             </div>
                         </div>
 
@@ -179,45 +176,32 @@
                     <div class="border-t border-gray-700 pt-3 space-y-3 text-xs">
                         <label class="block text-xs text-gray-400 uppercase">Graphic Adjustments</label>
                         <div class="flex items-center justify-between">
-                            <span>Shape/Vector Color</span>
+                            <span>Shape Color</span>
                             <input type="color" id="shapeFill" value="#00ffff" class="w-7 h-7 bg-transparent border-0 cursor-pointer">
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <span>Border Outline</span>
-                            <input type="color" id="shapeStrokeColor" value="#ffffff" class="w-7 h-7 bg-transparent border-0 cursor-pointer">
                         </div>
                         <div class="grid grid-cols-2 gap-2">
                             <button id="cropBtn" class="bg-gray-700 p-2 rounded hover:bg-gray-600">Crop Layer</button>
-                            <button id="flipXBtn" class="bg-gray-700 p-2 rounded hover:bg-gray-600">Flip Horizontal</button>
+                            <button id="flipXBtn" class="bg-gray-700 p-2 rounded hover:bg-gray-600">Flip X</button>
                         </div>
                         <div>
-                            <label class="block text-xs text-gray-500 mb-1">Image Filter Effects</label>
+                            <label class="block text-xs text-gray-500 mb-1">Image Filter</label>
                             <select id="imgFilter" class="w-full bg-gray-900 border border-gray-700 rounded p-1.5 text-xs">
-                                <option value="none">Normal (No Filter)</option>
+                                <option value="none">Normal</option>
                                 <option value="grayscale">Grayscale</option>
-                                <option value="sepia">Sepia Vintage</option>
-                                <option value="blur">Blur Layer</option>
-                                <option value="invert">Invert Colors</option>
-                                <option value="removeBg">Remove Background (Chroma)</option>
+                                <option value="sepia">Sepia</option>
+                                <option value="invert">Invert</option>
                             </select>
                         </div>
-                        <button id="freehandDraw" class="w-full bg-orange-700 hover:bg-orange-600 p-2 rounded font-medium">🖌️ Toggle Freehand Drawing Pen</button>
+                        <button id="freehandDraw" class="w-full bg-orange-700 hover:bg-orange-600 p-2 rounded font-medium">🖌️ Freehand Drawing Pen</button>
                     </div>
                 </div>
 
                 <div id="bg-tab" class="tab-content hidden space-y-4 text-xs">
-                    <label class="block text-xs text-gray-400 uppercase">Canvas Background Canvas</label>
-                    
+                    <label class="block text-xs text-gray-400 uppercase">Canvas Background</label>
                     <div class="space-y-3">
                         <label class="flex items-center space-x-2"><input type="radio" name="bgType" value="solid" checked> <span>Solid Color</span></label>
                         <input type="color" id="bgColorInput" value="#111827" class="w-full h-8 bg-transparent cursor-pointer">
-                        
-                        <label class="flex items-center space-x-2"><input type="radio" name="bgType" value="gradient"> <span>Gradient Fill</span></label>
-                        
-                        <label class="flex items-center space-x-2"><input type="radio" name="bgType" value="transparent"> <span>Transparent Canvas (PNG master)</span></label>
-                        
-                        <label class="flex items-center space-x-2"><input type="radio" name="bgType" value="image"> <span>Custom Background Image</span></label>
-                        <input type="file" id="bgImageLoader" accept="image/*" class="w-full">
+                        <label class="flex items-center space-x-2"><input type="radio" name="bgType" value="transparent"> <span>Transparent</span></label>
                     </div>
                 </div>
 
@@ -225,7 +209,6 @@
         </aside>
 
         <main class="flex-1 bg-gray-950 flex flex-col items-center justify-center relative p-4 select-none">
-            
             <div class="absolute top-4 left-4 bg-gray-800 px-3 py-1.5 rounded-full text-xs flex items-center space-x-3 border border-gray-700 z-10">
                 <button onclick="zoomCanvas(0.9)" class="hover:text-cyan-400 font-bold px-1">➖</button>
                 <span id="zoomLevel">Zoom: 100%</span>
@@ -233,11 +216,11 @@
                 <button onclick="resetZoom()" class="text-gray-400 text-[10px] uppercase border border-gray-600 px-1.5 py-0.5 rounded">Reset</button>
             </div>
 
-            <div id="canvas-wrapper" class="shadow-2xl border-2 border-dashed border-gray-700 overflow-hidden bg-[url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAGElEQVQYlWNgYGCQwoKxgqGgcJA5h3yFAAf2AENWD4z2AAAAAElFTkSuQmCC')]">
+            <div id="canvas-wrapper" class="shadow-2xl border border-gray-700 bg-white">
                 <canvas id="mainPixelCanvas"></canvas>
             </div>
             
-            <p class="text-gray-500 text-[11px] mt-3">💡 Tip: Use Mouse Scroll / Drag layers freely. Double click texts to change content.</p>
+            <p class="text-gray-500 text-[11px] mt-3">💡 Tip: Double click texts to change content.</p>
         </main>
 
         <aside class="w-64 bg-gray-800 border-l border-gray-700 flex flex-col">
@@ -247,4 +230,21 @@
             </div>
             
             <div id="layerListContainer" class="flex-1 overflow-y-auto p-2 space-y-1.5 text-xs">
-                <p class="text-center text-gray-500 mt-10 italic">No layers present
+                <p class="text-center text-gray-500 mt-10 italic">No layers present.</p>
+            </div>
+
+            <div class="p-3 bg-gray-850 border-t border-gray-700 space-y-2 text-xs">
+                <div class="grid grid-cols-2 gap-1 text-center">
+                    <button id="layerUp" class="bg-gray-700 p-1.5 rounded hover:bg-gray-600">Forward</button>
+                    <button id="layerDown" class="bg-gray-700 p-1.5 rounded hover:bg-gray-600">Backward</button>
+                    <button id="layerDuplicate" class="bg-gray-700 p-1.5 rounded hover:bg-gray-600 text-yellow-400">Duplicate</button>
+                    <button id="layerDelete" class="bg-red-950 text-red-400 p-1.5 rounded hover:bg-red-900">Delete</button>
+                </div>
+            </div>
+        </aside>
+
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
