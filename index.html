@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixelLab Web Clone</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+</head>
+<body class="bg-gray-900 text-white h-screen flex flex-col justify-between overflow-hidden">
+
+    <div class="bg-gray-800 p-3 flex justify-between items-center border-b border-gray-700">
+        <h1 class="text-xl font-bold text-cyan-400">PixelLab Web</h1>
+        <button id="saveBtn" class="bg-green-600 hover:bg-green-500 px-4 py-1.5 rounded font-medium text-sm">Save Image</button>
+    </div>
+
+    <div class="flex-1 flex items-center justify-center bg-gray-950 p-4">
+        <div class="shadow-2xl border border-gray-800 bg-white">
+            <canvas id="pixelCanvas" width="500" height="500"></canvas>
+        </div>
+    </div>
+
+    <div class="bg-gray-800 p-4 border-t border-gray-700 flex justify-around items-center">
+        <button id="addTextBtn" class="bg-cyan-600 hover:bg-cyan-500 px-5 py-2 rounded-full font-medium text-sm">＋ Add Text</button>
+        </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
