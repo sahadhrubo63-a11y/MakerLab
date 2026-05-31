@@ -5,22 +5,18 @@ let historyRedoStack = [];
 let isStateSavingBlocked = false;
 
 window.addEventListener('load', () => {
-    // 🔥 ২. স্প্ল্যাশ স্ক্রিন ট্রানজিশন এবং লোডিং বার ম্যানেজমেন্ট
     const progress = document.getElementById('loadingProgress');
     const splash = document.getElementById('splashScreen');
     
-    // লোডিং বার অ্যানিমেশন চালু করা
     if(progress) {
         setTimeout(() => {
             progress.style.transform = 'scaleX(1)';
         }, 100);
     }
 
-    // ২.৫ সেকেন্ড পর স্মুথ ফেইড আউট ইফেক্ট দিয়ে স্প্ল্যাশ স্ক্রিন বন্ধ হবে এবং মূল ইন্টারফেস রেডি হবে
     setTimeout(() => {
         if(splash) {
             splash.classList.add('splash-fade-out');
-            // ডম (DOM) থেকে পুরোপুরি রিমুভ করার জন্য ট্রানজিশন শেষের অপেক্ষা করা
             setTimeout(() => splash.remove(), 800);
         }
         initCanvas();
@@ -102,22 +98,25 @@ function setupEventListeners() {
         if (activeObj) { activeObj.set('angle', parseInt(e.target.value)); canvas.renderAll(); }
     });
 
-    // --- ASSET COLOR CHANGER ---
+    // --- কোড ১: গ্লোবাল বা ইউনিভার্সাল এসেট কালার ফিল্টার লজিক ---
     document.getElementById('shapeFill').addEventListener('input', (e) => {
         let activeObj = canvas.getActiveObject();
         if (!activeObj) return;
         let targetColor = e.target.value;
 
+        // যদি শেপ সিলেক্ট থাকে
         if (activeObj.type === 'rect' || activeObj.type === 'circle' || activeObj.type === 'triangle') {
             activeObj.set('fill', targetColor);
-        } else if (activeObj.type === 'image') {
+        } 
+        // যদি ইমেজ/পিএনজি সিলেক্ট থাকে (কালার ওভারলে টিন্ট ফিল্টার)
+        else if (activeObj.type === 'image') {
             activeObj.filters = [new fabric.Image.filters.BlendColor({ color: targetColor, mode: 'tint', alpha: 0.9 })];
             activeObj.applyFilters();
         }
         canvas.renderAll();
     });
 
-    // --- ASPECT RATIO CONTROLLER ---
+    // --- কোড ২: ক্যানভাস ৫টি অ্যাসপেক্ট রেশিও কন্ট্রোলার ---
     document.getElementById('canvasPreset').addEventListener('change', (e) => {
         let ratio = e.target.value;
         if (ratio === 'fb_post') { canvas.setWidth(600); canvas.setHeight(450); }
