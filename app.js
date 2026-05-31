@@ -1,28 +1,26 @@
-// Global App Core Variables
 let canvas;
 let canvasScale = 1;
 let historyUndoStack = [];
 let historyRedoStack = [];
 let isStateSavingBlocked = false;
 
-// 🔥 সমস্যা সমাধানের জন্য: উইন্ডো এবং লাইব্রেরি পুরোপুরি লোড হওয়ার পর ক্যানভাস চালু হবে
+// পেজ পুরোপুরি লোড হওয়ার পর ক্যানভাস ইনিশিয়ালাইজ হবে
 window.addEventListener('load', () => {
     initCanvas();
     setupEventListeners();
-    switchTab('text-tab'); // ডিফল্ট ট্যাব ওপেন
+    switchTab('text-tab'); // শুরুর ডিফল্ট ট্যাব
 });
 
-// 1. INITIALIZE CANVAS & SETTINGS
 function initCanvas() {
-    // HTML-এর সঠিক ID 'mainPixelCanvas' এর সাথে কানেক্ট করা
+    // সঠিক উইডথ ও হাইট দিয়ে Fabric Canvas চালু করা
     canvas = new fabric.Canvas('mainPixelCanvas', {
-        width: 600,
-        height: 450,
+        width: 500,
+        height: 500,
         backgroundColor: '#111827',
         preserveObjectStacking: true
     });
     
-    // কন্ট্রোল এনভায়রনমেন্ট স্টাইল (PixelLab UI Look)
+    // সিলেক্টেড অবজেক্ট বর্ডার স্টাইল
     fabric.Object.prototype.set({
         transparentCorners: false,
         cornerColor: '#22d3ee',
@@ -31,7 +29,7 @@ function initCanvas() {
         cornerStyle: 'circle'
     });
 
-    // ক্যানভাসে কোনো পরিবর্তন হলে হিস্ট্রি ও লেয়ার আপডেট হবে
+    // লিসেনার্স
     canvas.on('object:modified', () => saveState());
     canvas.on('object:added', () => { updateLayerPanel(); saveState(); });
     canvas.on('object:removed', () => { updateLayerPanel(); saveState(); });
@@ -41,14 +39,14 @@ function initCanvas() {
         document.getElementById('textString').value = '';
     });
     
-    saveState(); // ইনিশিয়াল স্টেট সেভ
+    saveState();
 }
 
-// 2. TAB CONTROLLER SWITCHER (গ্লোবাল স্কোপে রাখা হয়েছে যেন HTML থেকে সরাসরি কাজ করে)
+// গ্লোবাল ট্যাব সুইচ ফাংশন
 window.switchTab = function(tabId) {
     document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
     document.querySelectorAll('.tab-btn').forEach(el => {
-        el.classList.remove('text-cyan-400', 'border-b-2', 'border-cyan-400');
+        el.classList.remove('text-cyan-400', 'border-b-2', 'border-cyan-400', 'bg-gray-750');
         el.classList.add('text-gray-400');
     });
     
@@ -56,32 +54,30 @@ window.switchTab = function(tabId) {
     const targetBtn = document.getElementById('btn-' + tabId);
     
     if (targetTab) targetTab.classList.remove('hidden');
-    if (targetBtn) targetBtn.classList.add('text-cyan-400', 'border-b-2', 'border-cyan-400');
+    if (targetBtn) {
+        targetBtn.classList.add('text-cyan-400', 'border-b-2', 'border-cyan-400', 'bg-gray-750');
+        targetBtn.classList.remove('text-gray-400');
+    }
 }
 
-// 3. EVENT LISTENERS SETUP (সব বাটনের ক্লিক অ্যাকশন সচল করার জন্য)
 function setupEventListeners() {
-    
     // --- TEXT ADD BUTTON ---
-    const addTextBtn = document.getElementById('addText');
-    if(addTextBtn) {
-        addTextBtn.addEventListener('click', () => {
-            const textObj = new fabric.IText('Double Click to Edit', {
-                left: 100,
-                top: 150,
-                fontFamily: 'Poppins',
-                fontSize: 40,
-                fill: '#ffffff',
-                textAlign: 'center'
-            });
-            canvas.add(textObj);
-            canvas.setActiveObject(textObj);
-            canvas.renderAll();
-            updateLayerPanel();
+    document.getElementById('addText').addEventListener('click', () => {
+        const textObj = new fabric.IText('Double Click to Edit', {
+            left: 100,
+            top: 150,
+            fontFamily: 'Poppins',
+            fontSize: 40,
+            fill: '#ffffff',
+            textAlign: 'center'
         });
-    }
+        canvas.add(textObj);
+        canvas.setActiveObject(textObj);
+        canvas.renderAll();
+        updateLayerPanel();
+    });
 
-    // --- TEXT INPUT SYNC ---
+    // --- TEXT INPUT INPUT SYNC ---
     document.getElementById('textString').addEventListener('input', (e) => {
         let activeObj = canvas.getActiveObject();
         if (activeObj && activeObj.isType('text-like')) {
@@ -90,7 +86,7 @@ function setupEventListeners() {
         }
     });
 
-    // --- SLIDERS MUTATIONS ---
+    // --- SLIDERS ---
     document.getElementById('textSize').addEventListener('input', (e) => {
         let activeObj = canvas.getActiveObject();
         document.getElementById('v-size').innerText = e.target.value;
@@ -119,24 +115,7 @@ function setupEventListeners() {
         if (activeObj) { activeObj.set('fill', e.target.value); canvas.renderAll(); }
     });
 
-    // --- TTF FONT IMPORT ---
-    document.getElementById('customFont').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-            const fontName = 'CustomFont_' + Date.now();
-            const newStyle = document.createElement('style');
-            newStyle.appendChild(document.createTextNode(`@font-face { font-family: '${fontName}'; src: url(${evt.target.result}); }`));
-            document.head.appendChild(newStyle);
-            
-            let activeObj = canvas.getActiveObject();
-            if(activeObj) { activeObj.set('fontFamily', fontName); canvas.renderAll(); }
-        };
-        reader.readAsDataURL(file);
-    });
-
-    // --- IMAGE LOADER ---
+    // --- IMAGE & STICKERS ---
     document.getElementById('imageLoader').addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -153,7 +132,6 @@ function setupEventListeners() {
         reader.readAsDataURL(file);
     });
 
-    // --- STICKER LOADER ---
     document.getElementById('stickerLoader').addEventListener('change', (e) => {
         if (!e.target.value) return;
         const emoText = new fabric.Text(e.target.value, { fontSize: 50, left: 150, top: 150 });
@@ -163,23 +141,28 @@ function setupEventListeners() {
         e.target.value = ""; 
     });
 
-    // --- SHAPE & IMAGE FILTERS ---
-    document.getElementById('imgFilter').addEventListener('change', (e) => {
-        let activeObj = canvas.getActiveObject();
-        if (!activeObj || activeObj.type !== 'image') return;
-        activeObj.filters = [];
-        const filterVal = e.target.value;
-        if (filterVal === 'grayscale') activeObj.filters.push(new fabric.Image.filters.Grayscale());
-        if (filterVal === 'sepia') activeObj.filters.push(new fabric.Image.filters.Sepia());
-        if (filterVal === 'invert') activeObj.filters.push(new fabric.Image.filters.Invert());
-        activeObj.applyFilters();
+    // --- ASPECT RATIO ---
+    document.getElementById('canvasPreset').addEventListener('change', (e) => {
+        let ratio = e.target.value;
+        if (ratio === '16:9') { canvas.setWidth(750); canvas.setHeight(422); }
+        else if (ratio === '4:5') { canvas.setWidth(500); canvas.setHeight(625); }
+        else { canvas.setWidth(500); canvas.setHeight(500); }
         canvas.renderAll();
     });
 
-    // --- FLIP BUTTON ---
-    document.getElementById('flipXBtn').addEventListener('click', () => {
-        let activeObj = canvas.getActiveObject();
-        if (activeObj) { activeObj.set('flipX', !activeObj.get('flipX')); canvas.renderAll(); }
+    // --- EXPORT ---
+    document.getElementById('exportBtn').addEventListener('click', () => {
+        let format = document.getElementById('exportFormat').value;
+        const dataURL = canvas.toDataURL({ format: format, quality: 1.0, multiplier: 2 });
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.download = `pixellab_${Date.now()}.${format}`;
+        downloadAnchor.href = dataURL;
+        downloadAnchor.click();
+    });
+
+    // --- BACKGROUND COLOR ---
+    document.getElementById('bgColorInput').addEventListener('input', (e) => {
+        canvas.setBackgroundColor(e.target.value, canvas.renderAll.bind(canvas));
     });
 
     // --- LAYER CONTROL ACTIONS ---
@@ -195,72 +178,31 @@ function setupEventListeners() {
         let activeObj = canvas.getActiveObject();
         if(activeObj) { canvas.remove(activeObj); canvas.discardActiveObject().renderAll(); updateLayerPanel(); }
     });
-
-    // --- ASPECT RATIO CONFIG ---
-    document.getElementById('canvasPreset').addEventListener('change', (e) => {
-        let ratio = e.target.value;
-        if (ratio === '16:9') { canvas.setWidth(750); canvas.setHeight(422); }
-        else if (ratio === '4:5') { canvas.setWidth(500); canvas.setHeight(625); }
-        else { canvas.setWidth(500); canvas.setHeight(500); }
-        canvas.renderAll();
-    });
-
-    // --- HIGH-RES EXPORT ---
-    document.getElementById('exportBtn').addEventListener('click', () => {
-        let format = document.getElementById('exportFormat').value;
-        const dataURL = canvas.toDataURL({ format: format, quality: 1.0, multiplier: 2 });
-        const downloadAnchor = document.createElement('a');
-        downloadAnchor.download = `pixellab_${Date.now()}.${format}`;
-        downloadAnchor.href = dataURL;
-        downloadAnchor.click();
-    });
-
-    // --- BACKGROUND CONTROLS ---
-    document.getElementById('bgColorInput').addEventListener('input', (e) => {
-        canvas.setBackgroundColor(e.target.value, canvas.renderAll.bind(canvas));
-    });
 }
 
-// 4. SYNC DATA FROM OBJECT TO INTERFACE
 function syncSelectedObjectToUI() {
     const activeObj = canvas.getActiveObject();
     if (!activeObj) return;
-
     if (activeObj.isType('text-like')) {
         document.getElementById('textString').value = activeObj.text || '';
         document.getElementById('textSize').value = activeObj.fontSize;
         document.getElementById('v-size').innerText = activeObj.fontSize;
-        document.getElementById('textRotation').value = activeObj.angle || 0;
-        document.getElementById('v-rot').innerText = Math.round(activeObj.angle || 0) + '°';
-        document.getElementById('textOpacity').value = (activeObj.opacity || 1) * 100;
-        document.getElementById('v-opac').innerText = Math.round((activeObj.opacity || 1) * 100);
-        document.getElementById('fontFamily').value = activeObj.fontFamily;
     }
 }
 
-// 5. GLOBAL VECTOR SHAPES SPARKER
 window.addShape = function(shapeType) {
     let shape;
     const props = { left: 150, top: 150, fill: '#00ffff', width: 100, height: 100, strokeWidth: 2, stroke: '#ffffff' };
-    
     if (shapeType === 'rect') shape = new fabric.Rect(props);
     else if (shapeType === 'circle') shape = new fabric.Circle({ ...props, radius: 50 });
     else if (shapeType === 'triangle') shape = new fabric.Triangle(props);
-    else if (shapeType === 'line') shape = new fabric.Line([50, 50, 200, 50], { stroke: '#00ffff', strokeWidth: 4 });
     
-    if(shape) {
-        canvas.add(shape);
-        canvas.setActiveObject(shape);
-        canvas.renderAll();
-        updateLayerPanel();
-    }
+    if(shape) { canvas.add(shape); canvas.setActiveObject(shape); canvas.renderAll(); updateLayerPanel(); }
 }
 
-// 6. LAYER LIST DYNAMIC RE-RENDER
 function updateLayerPanel() {
     const container = document.getElementById('layerListContainer');
     if(!container) return;
-    
     const objects = canvas.getObjects();
     document.getElementById('layerCount').innerText = `${objects.length} Layers`;
 
@@ -268,46 +210,24 @@ function updateLayerPanel() {
         container.innerHTML = `<p class="text-center text-gray-500 mt-10 italic">No layers present.</p>`;
         return;
     }
-
     container.innerHTML = '';
     for (let i = objects.length - 1; i >= 0; i--) {
         let obj = objects[i];
         let name = obj.type.toUpperCase();
         if (obj.text) name = `"${obj.text.substring(0,10)}"`;
-
         let div = document.createElement('div');
-        div.className = `p-2 mb-1 border rounded flex justify-between items-center bg-gray-900 border-gray-700 cursor-pointer`;
-        div.innerHTML = `<span class="truncate font-mono">${name}</span>`;
-        div.addEventListener('click', () => {
-            canvas.setActiveObject(obj);
-            canvas.renderAll();
-        });
+        div.className = `p-2 mb-1 border rounded bg-gray-900 border-gray-700 cursor-pointer`;
+        div.innerHTML = `<span>${name}</span>`;
+        div.addEventListener('click', () => { canvas.setActiveObject(obj); canvas.renderAll(); });
         container.appendChild(div);
     }
 }
 
-// 7. TIME TRAVEL HISTORY (Undo/Redo Core)
 function saveState() {
     if (isStateSavingBlocked || !canvas) return;
-    let json = JSON.stringify(canvas.toJSON());
-    historyUndoStack.push(json);
-    historyRedoStack = [];
+    historyUndoStack.push(JSON.stringify(canvas.toJSON()));
 }
 
-document.getElementById('undoBtn').addEventListener('click', () => {
-    if (historyUndoStack.length <= 1) return;
-    isStateSavingBlocked = true;
-    let current = historyUndoStack.pop();
-    historyRedoStack.push(current);
-    let previous = historyUndoStack[historyUndoStack.length - 1];
-    canvas.loadFromJSON(previous, () => {
-        canvas.renderAll();
-        isStateSavingBlocked = false;
-        updateLayerPanel();
-    });
-});
-
-// 8. ZOOM MANAGER WINDOW FUNCTIONS
 window.zoomCanvas = function(factor) {
     canvasScale *= factor;
     document.getElementById('canvas-wrapper').style.transform = `scale(${canvasScale})`;
