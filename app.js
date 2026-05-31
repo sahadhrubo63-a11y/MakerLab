@@ -4,11 +4,29 @@ let historyUndoStack = [];
 let historyRedoStack = [];
 let isStateSavingBlocked = false;
 
-// পেজ পুরোপুরি লোড হওয়ার পর ক্যানভাস ইনিশিয়ালাইজ হবে
+// 🔥 পেজ লোড হওয়ার সময় স্প্ল্যাশ স্ক্রিন ও প্রোগ্রেসবার হ্যান্ডেল করা হবে
 window.addEventListener('load', () => {
-    initCanvas();
-    setupEventListeners();
-    switchTab('text-tab'); // শুরুর ডিফল্ট ট্যাব
+    const progress = document.getElementById('loadingProgress');
+    const splash = document.getElementById('splashScreen');
+    
+    // লোডিং বার গ্রোথ অ্যানিমেশন ট্র্রিগার
+    if(progress) {
+        setTimeout(() => {
+            progress.style.transform = 'scaleX(1)';
+        }, 150);
+    }
+
+    // ২.৮ সেকেন্ড প্রোগ্রেস বার শেষ হওয়ার পর মূল ইন্টারফেস চালু হবে
+    setTimeout(() => {
+        if(splash) {
+            splash.classList.add('splash-fade-out');
+            // ট্রানজিশন শেষ হলে ডম এলিমেন্ট রিমুভ করা
+            setTimeout(() => splash.remove(), 800);
+        }
+        initCanvas();
+        setupEventListeners();
+        switchTab('text-tab'); // শুরুর ডিফল্ট ট্যাব
+    }, 2800);
 });
 
 function initCanvas() {
@@ -144,11 +162,9 @@ function setupEventListeners() {
 
         let targetColor = e.target.value;
 
-        // যদি অবজেক্টটি Shape বা Vector হয়
         if (activeObj.type === 'rect' || activeObj.type === 'circle' || activeObj.type === 'triangle' || activeObj.type === 'star' || activeObj.type === 'arrow' || activeObj.type === 'line') {
             activeObj.set('fill', targetColor);
         } 
-        // যদি অবজেক্টটি Image হয় (PixelLab Blend Color Tint Mode)
         else if (activeObj.type === 'image') {
             activeObj.filters = [
                 new fabric.Image.filters.BlendColor({
@@ -166,15 +182,15 @@ function setupEventListeners() {
     document.getElementById('canvasPreset').addEventListener('change', (e) => {
         let ratio = e.target.value;
         if (ratio === 'fb_post') { 
-            canvas.setWidth(600); canvas.setHeight(450); // Facebook Post (4:3)
+            canvas.setWidth(600); canvas.setHeight(450);
         } else if (ratio === 'ig_post') { 
-            canvas.setWidth(500); canvas.setHeight(500); // Instagram Post (1:1 Standard)
+            canvas.setWidth(500); canvas.setHeight(500);
         } else if (ratio === 'fb_banner') { 
-            canvas.setWidth(820); canvas.setHeight(312); // Facebook Cover Banner
+            canvas.setWidth(820); canvas.setHeight(312);
         } else if (ratio === 'yt_thumb') { 
-            canvas.setWidth(711); canvas.setHeight(400); // YouTube Thumbnail (16:9)
+            canvas.setWidth(711); canvas.setHeight(400);
         } else { 
-            canvas.setWidth(500); canvas.setHeight(500); // Custom Default (1:1)
+            canvas.setWidth(500); canvas.setHeight(500);
         }
         canvas.renderAll();
     });
@@ -184,7 +200,7 @@ function setupEventListeners() {
         let format = document.getElementById('exportFormat').value;
         const dataURL = canvas.toDataURL({ format: format, quality: 1.0, multiplier: 2 });
         const downloadAnchor = document.createElement('a');
-        downloadAnchor.download = `pixellab_${Date.now()}.${format}`;
+        downloadAnchor.download = `makerlab_${Date.now()}.${format}`;
         downloadAnchor.href = dataURL;
         downloadAnchor.click();
     });
